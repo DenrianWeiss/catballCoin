@@ -50,14 +50,16 @@ func coinHarvestWorker(t *time.Ticker, stop chan struct{}, config *model.CoinTas
 		tasksLock.Unlock()
 		return
 	}
-	select {
-	case <- t.C: {
+        for {
+	    select {
+	    case <- t.C: {
 		go coinHarvestAction(client, config, prevBalance, wal)
-	}
-	case <- stop: {
+	    }
+	    case <- stop: {
 		return
-	}
-	}
+	    }
+	    }
+        }
 }
 
 func coinHarvestAction(rpc *jsonrpc.Client, config *model.CoinTask, prevBalance *big.Int, wal *wallet.Key) {
